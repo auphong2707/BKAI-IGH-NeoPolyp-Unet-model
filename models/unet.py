@@ -1,23 +1,9 @@
 import torch
 import torch.nn as nn
 
-import sys
-sys.path.append('.')
-from config import *
-
 class UNet(nn.Module):
-    def __init__(
-        self,
-        in_channels=IN_CHANNELS,
-        out_channels=OUT_CHANNELS,
-        base_channels=BASE_CHANNELS,
-        num_layers=NUM_LAYERS,
-        kernel_size=KERNEL_SIZE,
-        padding=PADDING,
-        dropout_rate=DROPOUT_RATE,
-        upsampling_method=UPSAMPLING_METHOD,
-        device=DEVICE,
-    ):
+    def __init__(self, in_channels, out_channels, base_channels, num_layers, 
+                 kernel_size, padding, dropout_rate, upsampling_method, device):
         super(UNet, self).__init__()
 
         def conv_block(in_ch, out_ch):
@@ -84,8 +70,10 @@ class UNet(nn.Module):
 
 
 if __name__ == '__main__':
+    from config import *
     # Example Usage
-    model = UNet()
+    model = UNet(IN_CHANNELS, OUT_CHANNELS, BASE_CHANNELS, NUM_LAYERS,
+                 KERNEL_SIZE, PADDING, DROPOUT_RATE, UPSAMPLING_METHOD, DEVICE)
 
     # Check the output
     x = torch.randn(BATCH_SIZE, IN_CHANNELS, IMG_SIZE[0], IMG_SIZE[1]).to(DEVICE)
