@@ -61,10 +61,10 @@ def mask2string(dir):
     }
     return r
 
-def convert_output_to_csv(input_dir, output_dir):
+def convert_infer_to_csv(input_dir, output_dir):
     res = mask2string(input_dir)
     df = pd.DataFrame(columns=['Id', 'Expected'])
     df['Id'] = res['ids']
     df['Expected'] = res['strings']
 
-    df.to_csv(r'output_dir/output.csv', index=False)
+    df.to_csv(f'{output_dir}/output.csv', index=False)
