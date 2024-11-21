@@ -42,10 +42,21 @@ def main():
     trainer.train(dataloaders, num_epochs=NUM_EPOCHS)
     
     # Infer test set
-    infer_test_set_color(model, TEST_IMAGE_DIR, INFER_IMAGE_DIR, DEVICE, input_size=IMG_SIZE, threshold=0.5)
+    infer_test_set_color(model, TEST_IMAGE_DIR, f'results/{EXPERIMENT_NAME}/', DEVICE, input_size=IMG_SIZE, threshold=0.5)
     
     # Change result
-    convert_infer_to_csv(INFER_IMAGE_DIR, RESULT_DIR)
+    convert_infer_to_csv(f'results/{EXPERIMENT_NAME}', 'results/submission.csv')
+    
+    # Upload results to Hugging Face
+    login(token=args.huggingface_token)
+    
+    api = HfApi()
+    api.upload_large_folder(
+        folder_path='results',
+        repo_type='model',
+        repo_id='auphong2707/BKAI-IGH-NeoPolyp-Unet-model',
+        private=False
+    )
     
     
 if __name__ == '__main__':

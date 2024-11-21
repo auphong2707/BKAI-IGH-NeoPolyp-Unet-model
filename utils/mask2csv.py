@@ -67,4 +67,4 @@ def convert_infer_to_csv(input_dir, output_dir):
     df['Id'] = res['ids']
     df['Expected'] = res['strings']
 
-    df.to_csv(f'{output_dir}/output.csv', index=False)
+    df.to_csv(output_dir, index=False)

@@ -6,8 +6,6 @@ import torch
 TRAIN_IMAGE_DIR = "./data/train/train"
 TRAIN_MASK_DIR = "./data/train_gt/train_gt"
 TEST_IMAGE_DIR = "./data/test/test"
-INFER_IMAGE_DIR = "./results/infer"
-RESULT_DIR = "./results"
 
 # Model parameters
 IN_CHANNELS = 3
