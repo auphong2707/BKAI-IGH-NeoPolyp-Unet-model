@@ -35,13 +35,11 @@ def main():
     trainer = UNetTrainer(model=model,
                           name=experiment_name,
                           learning_rate=LEARNING_RATE,
-                          device=DEVICE)
+                          wandb_key=args.wandb_key,
+                          device=DEVICE,)
     
     # Train model
-    trainer.train(dataloaders['train'], dataloaders['val'], n_epochs=NUM_EPOCHS, wandb_key=args.wandb_key)
-    
-    # Infer test set
-    infer_test_set_color(model, TEST_IMAGE_DIR, f'results/{EXPERIMENT_NAME}/infer_image', DEVICE, img_size=IMG_SIZE)
+    trainer.train(dataloaders['train'], dataloaders['val'], n_epochs=NUM_EPOCHS)
     
     # Change result
     convert_infer_to_csv(f'results/{EXPERIMENT_NAME}/infer_image/', 'results/submission.csv')
