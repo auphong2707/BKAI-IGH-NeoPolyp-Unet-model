@@ -9,7 +9,7 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 class FirstServeDataset(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None):
+    def __init__(self, image_dir, mask_dir, resize, transform=None):
         """
         Custom dataset for U-Net models.
 
@@ -24,6 +24,7 @@ class FirstServeDataset(Dataset):
         self.image_files = sorted(os.listdir(image_dir))
         self.mask_files = sorted(os.listdir(mask_dir))
         self.transform = transform
+        self.resize = resize
 
     def __len__(self):
         return len(self.image_files)
