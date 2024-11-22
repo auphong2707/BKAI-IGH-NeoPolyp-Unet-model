@@ -9,7 +9,7 @@ TEST_IMAGE_DIR = "./data/test/test"
 
 # Model parameters
 IN_CHANNELS = 3
-OUT_CHANNELS = 3
+OUT_CHANNELS = 1
 NUM_LAYERS = 4
 BASE_CHANNELS = 64
 KERNEL_SIZE = 3
