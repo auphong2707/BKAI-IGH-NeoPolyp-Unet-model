@@ -6,6 +6,7 @@ import time
 
 from utils.helper import save_checkpoint
 from utils.logger import setup_logger
+from tqdm import tqdm
 
 class UNetTrainer:
     def __init__(self, 
@@ -51,7 +52,7 @@ class UNetTrainer:
         total_loss = 0
         self.model.train()  # Set model to training mode
 
-        for images, masks in dataloader:
+        for images, masks in tqdm(dataloader, desc="Training Epoch", leave=False):
             images, masks = images.to(self.device), masks.to(self.device)
 
             # Zero gradients
