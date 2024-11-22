@@ -105,13 +105,13 @@ class UNetTrainer:
             val_loss = self.validate(val_dataloader)
 
             # Save checkpoint
-            save_checkpoint(epoch, train_loss, f"{self.checkpoint_directory}/checkpoint.pth", loss=val_loss)
+            save_checkpoint(self.model, self.optimizer, epoch, train_loss, self.checkpoint_directory + '/checkpoint.pth')
 
             # Save best model
             if val_loss < self.best_loss:
                 self.best_loss = val_loss
-                save_checkpoint(epoch, val_loss, f"{self.checkpoint_directory}/best.pth", loss=val_loss, best=True)
-
+                save_checkpoint(self.model, self.optimizer, epoch, train_loss, self.checkpoint_directory + '/best.pth', best=True)
+                
             # Log progress
             if epoch % print_every == 0:
                 elapsed = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
