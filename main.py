@@ -30,7 +30,8 @@ def main():
                  kernel_size=KERNEL_SIZE,
                  padding=PADDING,
                  dropout_rate=DROPOUT_RATE,
-                 upsampling_method=UPSAMPLING_METHOD)
+                 upsampling_method=UPSAMPLING_METHOD,
+                 device=DEVICE)
     
     # Initialize trainer
     trainer = UNetTrainer(model=model,
