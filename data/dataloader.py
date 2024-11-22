@@ -111,8 +111,8 @@ def get_dataloaders(image_dir, mask_dir, batch_size=16, img_size=(256, 256), aug
     Returns:
         dict: A dictionary containing 'train' and 'val' DataLoaders.
     """
-    dataset = FirstServeDataset(img_dir=image_dir,
-                                label_dir=mask_dir,
+    dataset = FirstServeDataset(image_dir=image_dir,
+                                mask_dir=mask_dir,
                                 resize=img_size,
                                 transform = None)
 
