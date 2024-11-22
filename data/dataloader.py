@@ -126,42 +126,41 @@ if __name__ == "__main__":
     train_loader = dataloaders['train']
     val_loader = dataloaders['val']
     
-import torch
-import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
 
-mean = [0.485, 0.456, 0.406]  # Same as used in transforms.Normalize
-std = [0.229, 0.224, 0.225]
+    mean = [0.485, 0.456, 0.406]  # Same as used in transforms.Normalize
+    std = [0.229, 0.224, 0.225]
 
-for images, masks in train_loader:
-    # Take the first image and mask from the batch
-    image = images[0]  # Shape: (C, H, W)
-    mask = masks[0]    # Shape: (C, H, W) or (H, W) depending on mask transform
+    for images, masks in train_loader:
+        # Take the first image and mask from the batch
+        image = images[0]  # Shape: (C, H, W)
+        mask = masks[0]    # Shape: (C, H, W) or (H, W) depending on mask transform
 
-    # Denormalize the image
-    image = denormalize(image, mean, std)
+        # Denormalize the image
+        image = denormalize(image, mean, std)
 
-    # Permute dimensions for visualization (C, H, W) -> (H, W, C)
-    image = image.permute(1, 2, 0).numpy()
-    mask = mask.permute(1, 2, 0).numpy()  # Adjust for RGB masks
+        # Permute dimensions for visualization (C, H, W) -> (H, W, C)
+        image = image.permute(1, 2, 0).numpy()
+        mask = mask.permute(1, 2, 0).numpy()  # Adjust for RGB masks
 
-    # Clip image values to [0, 1] for visualization
-    image = image.clip(0, 1)
+        # Clip image values to [0, 1] for visualization
+        image = image.clip(0, 1)
 
-    # Plot the image and mask
-    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
-    ax[0].imshow(image)
-    ax[0].set_title('Image')
-    ax[0].axis('off')
+        # Plot the image and mask
+        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+        ax[0].imshow(image)
+        ax[0].set_title('Image')
+        ax[0].axis('off')
 
-    ax[1].imshow(mask)
-    ax[1].set_title('Mask')
-    ax[1].axis('off')
+        ax[1].imshow(mask)
+        ax[1].set_title('Mask')
+        ax[1].axis('off')
 
-    plt.savefig('sample_image_and_mask.png')
-    
-    
-    # Print Shape of Image and Mask
-    print(f"Image shape: {image.shape}")
-    print(f"Mask shape: {mask.shape}")
-    break
+        plt.savefig('sample_image_and_mask.png')
+        
+        
+        # Print Shape of Image and Mask
+        print(f"Image shape: {image.shape}")
+        print(f"Mask shape: {mask.shape}")
+        break
 

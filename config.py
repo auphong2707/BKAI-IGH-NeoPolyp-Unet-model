@@ -25,7 +25,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Data parameters
 IMG_SIZE = (256, 256)
-AUGMENTATIONS = True
+AUGMENTATIONS = False
 VAL_SPLIT = 0.15
 
 # Additional parameters
