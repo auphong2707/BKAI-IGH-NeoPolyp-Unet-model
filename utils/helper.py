@@ -10,6 +10,8 @@ import torch
 import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
+import cv2
+import albumentations as A
 
 def set_seed(seed):
     random.seed(seed)
@@ -68,18 +70,6 @@ def load_checkpoint(model: torch.nn.Module,
     epoch = checkpoint['epoch']
     print(f"Checkpoint loaded from {filepath}, trained for {epoch} epochs")
     return epoch
-
-def mask_to_rgb(output, mask, 
-                color_dict={0: (0, 0, 0),
-                            1: (255, 0, 0),
-                            2: (0, 255, 0)}
-                ):
-    output = np.zeros((mask.shape[0], mask.shape[1], 3))
-
-    for k in color_dict.keys():
-        output[mask==k] = color_dict[k]
-
-    return np.uint8(output)
 
 def as_minutes(s: int):
     """Converts seconds to minutes and seconds.
@@ -154,3 +144,59 @@ def save_plot(csv_directory, filename='loss_plot.png'):
     # Save the plot to a file
     plt.savefig(filename)
     plt.close()  # Close the plot to free memory
+
+def mask_to_rgb(output, mask, 
+                color_dict={0: (0, 0, 0),
+                            1: (255, 0, 0),
+                            2: (0, 255, 0)}
+                ):
+    output = np.zeros((mask.shape[0], mask.shape[1], 3))
+
+    for k in color_dict.keys():
+        output[mask==k] = color_dict[k]
+
+    return np.uint8(output)
+
+def infer_and_save(model, test_dir, output_dir, device):
+    """
+    Perform inference on a model and save the output masks as images.
+    
+    Args:
+        model: The trained PyTorch model.
+        test_dir: Path to the directory containing test images.
+        output_dir: Path to the directory to save output masks.
+        device: The device to perform inference on (e.g., 'cpu' or 'cuda').
+        val_transformation: Transformation to apply to the input image.
+    """
+    val_transformation = A.Compose([
+        A.Normalize(mean=(0.485, 0.456, 0.406),std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ])
+    
+    model.eval()
+    os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
+
+    for img_name in os.listdir(test_dir):
+        img_path = os.path.join(test_dir, img_name)
+        ori_img = cv2.imread(img_path)
+        ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+        ori_h, ori_w = ori_img.shape[:2]
+
+        # Preprocess the image
+        img = cv2.resize(ori_img, (256, 256))
+        transformed = val_transformation(image=img)
+        input_img = transformed["image"].unsqueeze(0).to(device)
+
+        # Perform inference
+        with torch.no_grad():
+            output_mask = model(input_img).squeeze(0).cpu().numpy().transpose(1, 2, 0)
+
+        # Resize and process the output mask
+        mask = cv2.resize(output_mask, (ori_w, ori_h))
+        mask = np.argmax(mask, axis=2)
+        mask_rgb = mask_to_rgb(mask)
+        mask_rgb = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2BGR)
+
+        # Save the resulting mask
+        save_path = os.path.join(output_dir, img_name)
+        cv2.imwrite(save_path, mask_rgb)

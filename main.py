@@ -1,4 +1,4 @@
-from utils.helper import set_seed
+from utils.helper import set_seed, infer_and_save
 set_seed(42)
 
 from data.dataloader import get_dataloaders
@@ -41,8 +41,12 @@ def main():
     # Train model
     trainer.train(dataloaders['train'], dataloaders['val'], n_epochs=NUM_EPOCHS)
     
+    # Infer and save masks
+    infer_and_save(model, TEST_IMAGE_DIR, f'results/{EXPERIMENT_NAME}/infer_image/', DEVICE)
+    
     # Change result
     convert_infer_to_csv(f'results/{EXPERIMENT_NAME}/infer_image/', 'results/submission.csv')
+    
     
     # Upload results to Hugging Face
     login(token=args.huggingface_token)

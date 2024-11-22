@@ -18,9 +18,9 @@ DROPOUT_RATE = 0.2
 UPSAMPLING_METHOD = "TransposedConv"
 
 # Training parameters
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 LEARNING_RATE = 0.00001
-NUM_EPOCHS = 30
+NUM_EPOCHS = 50
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Data parameters
