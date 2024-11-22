@@ -5,7 +5,7 @@ import time
 
 from matplotlib import pyplot as plt, ticker
 import pandas as pd
-import cv2
+import cv2 # type: ignore
 import numpy as np
 import torch
 
