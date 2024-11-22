@@ -15,7 +15,7 @@ BASE_CHANNELS = 128
 KERNEL_SIZE = 3
 PADDING = 1
 DROPOUT_RATE = 0.2
-UPSAMPLING_METHOD = "Interpolation"
+UPSAMPLING_METHOD = "TransposedConv"
 
 # Training parameters
 BATCH_SIZE = 16
