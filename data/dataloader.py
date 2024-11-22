@@ -9,25 +9,15 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 class FirstServeDataset(Dataset):
-    def __init__(self, image_dir, mask_dir, resize, transform=None):
-        """
-        Custom dataset for U-Net models.
-
-        Args:
-            image_dir (str): Path to the directory containing input images.
-            mask_dir (str): Path to the directory containing masks.
-            transform (callable, optional): Transformation for input images.
-            target_transform (callable, optional): Transformation for masks.
-        """
-        self.image_dir = image_dir
-        self.mask_dir = mask_dir
-        self.image_files = sorted(os.listdir(image_dir))
-        self.mask_files = sorted(os.listdir(mask_dir))
-        self.transform = transform
+    def __init__(self, img_dir, label_dir, resize=None, transform=None):
+        self.image_dir = img_dir
+        self.mask_dir = label_dir
         self.resize = resize
+        self.transform = transform
+        self.images = os.listdir(self.image_dir)
 
     def __len__(self):
-        return len(self.image_files)
+        return len(self.images)
     
     def read_mask(self, mask_path):
         image = cv2.imread(mask_path)
@@ -55,16 +45,14 @@ class FirstServeDataset(Dataset):
         return full_mask
 
     def __getitem__(self, idx):
-        # Read image and mask files
-        img_path = os.path.join(self.image_dir, self.image_files[idx])
-        label_path = os.path.join(self.mask_files, self.image_files[idx])
+        img_path = os.path.join(self.image_dir, self.images[idx])
+        mask_path = os.path.join(self.mask_dir, self.images[idx])
         
         image = cv2.imread(img_path)  #  BGR
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Convert to RGB
         image = cv2.resize(image, self.resize)
         
-        label = self.read_mask(label_path)  
-        
+        label = self.read_mask(mask_path)  
         if self.transform:
             image = self.transform(image)
             
