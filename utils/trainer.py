@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import time
 
-from utils.helper import save_checkpoint
+from utils.helper import save_checkpoint, load_checkpoint, save_loss, save_plot, time_since
 from utils.logger import setup_logger
 from tqdm import tqdm
 
@@ -96,31 +96,50 @@ class UNetTrainer:
 
         return total_loss / len(val_dataloader)
 
-    def train(self, train_dataloader, val_dataloader, n_epochs, print_every=1):
-        start_time = time.time()
-        train_losses, val_losses = [], []
+    def train(self, train_dataloader, val_dataloader, n_epochs, print_every=1, plot_every=1):
+        # Load checkpoint if available
+        load_checkpoint_path = self.checkpoint_directory + '/checkpoint.pth'
+        start_epoch = load_checkpoint(self.model, self.optimizer, load_checkpoint_path) + 1
+        
+        print(f"\nStart training from epoch {start_epoch}")
+        print('-' * 80)
+        
+        # Initialize variables
+        start = time.time()
+
+        train_losses = []
+        val_losses = []
 
         # Training loop
-        for epoch in range(1, n_epochs + 1):
+        for epoch in range(start_epoch, n_epochs + 1):
+            # Training step
             train_loss = self.train_epoch(train_dataloader)
+            
+            # Validation step
             val_loss = self.validate(val_dataloader)
-
+                
             # Save checkpoint
             save_checkpoint(self.model, self.optimizer, epoch, train_loss, self.checkpoint_directory + '/checkpoint.pth')
 
-            # Save best model
-            if val_loss < self.best_loss:
+            # Save the best checkpoint
+            if epoch == 1 or val_loss < self.best_loss:
                 self.best_loss = val_loss
                 save_checkpoint(self.model, self.optimizer, epoch, train_loss, self.checkpoint_directory + '/best.pth', best=True)
                 
-            # Log progress
+            # Print loss every 'print_every' epochs
             if epoch % print_every == 0:
-                elapsed = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
-                self.logger.info(
-                    f"Epoch {epoch}/{n_epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Time Elapsed: {elapsed}"
-                )
-                print(f"Epoch {epoch}/{n_epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Time Elapsed: {elapsed}")
+                self.logger.info('%s (%d %d%%) Train loss: %.4f | Val loss: %.4f' % 
+                                 (time_since(start, epoch / n_epochs), 
+                                  epoch, epoch / n_epochs * 100, 
+                                  train_loss, val_loss))
+                print('-' * 80)
+            
+            # Collect losses for plotting
+            if epoch % plot_every == 0:
+                train_losses.append(train_loss)
+                val_losses.append(val_loss)
+                
+            save_loss(epoch, train_loss, val_loss, self.checkpoint_directory + '/losses.csv')
 
-            # Track losses
-            train_losses.append(train_loss)
-            val_losses.append(val_loss)
+        # Save the plot
+        save_plot(self.checkpoint_directory + '/losses.csv', self.checkpoint_directory + '/losses.png')
