@@ -40,7 +40,7 @@ def main():
                           device=DEVICE)
     
     # Train model
-    trainer.train(dataloaders['train'], dataloaders['val'], num_epochs=NUM_EPOCHS)
+    trainer.train(dataloaders['train'], dataloaders['val'], n_epochs=NUM_EPOCHS)
     
     # Infer test set
     infer_test_set_color(model, TEST_IMAGE_DIR, f'results/{EXPERIMENT_NAME}/', DEVICE, input_size=IMG_SIZE, threshold=0.5)
