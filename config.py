@@ -24,7 +24,7 @@ NUM_EPOCHS = 300
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Data parameters
-IMG_SIZE = (512, 512)
+IMG_SIZE = (256, 256)
 AUGMENTATIONS = True
 VAL_SPLIT = 0.15
 
