@@ -56,7 +56,7 @@ class UNetTrainer:
             key = wandb_key,
         )
         wandb.init(
-            project = "PolypSegment"
+            project = "BKAI-IGH-NeoPolyp-Unet-model"
         )
 
     def train_epoch(self, dataloader):
