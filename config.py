@@ -19,8 +19,8 @@ UPSAMPLING_METHOD = "Interpolation"
 
 # Training parameters
 BATCH_SIZE = 16
-LEARNING_RATE = 0.0001
-NUM_EPOCHS = 50
+LEARNING_RATE = 0.00001
+NUM_EPOCHS = 30
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Data parameters
