@@ -70,12 +70,14 @@ class UNet(nn.Module):
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append('.')
     from config import *
     # Example Usage
     model = UNet(IN_CHANNELS, OUT_CHANNELS, BASE_CHANNELS, NUM_LAYERS,
                  KERNEL_SIZE, PADDING, DROPOUT_RATE, UPSAMPLING_METHOD, DEVICE)
 
     # Check the output
-    x = torch.randn(BATCH_SIZE, IN_CHANNELS, IMG_SIZE[0], IMG_SIZE[1]).to(DEVICE)
+    x = torch.randn(1, IN_CHANNELS, IMG_SIZE[0], IMG_SIZE[1]).to(DEVICE)
     output = model(x)
     print(output.shape)  # Should match (batch_size, out_channels, height, width)
