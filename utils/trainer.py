@@ -97,6 +97,7 @@ class UNetTrainer:
         with torch.no_grad():
             for images, masks in val_dataloader:
                 images, masks = images.to(self.device), masks.to(self.device)
+                masks = masks.squeeze(dim=1).long()
 
                 # Forward pass
                 outputs = self.model(images)

@@ -106,10 +106,10 @@ def get_dataloaders(image_dir, mask_dir, batch_size=16, img_size=(256, 256), aug
                                 transform = None)
 
     images_data = []
-    labels_data = []
+    masks_data = []
     for x,y in dataset:
         images_data.append(x)
-        labels_data.append(y)
+        masks_data.append(y)
         
     train_transformation = A.Compose([
         A.HorizontalFlip(p=0.4),
@@ -125,18 +125,32 @@ def get_dataloaders(image_dir, mask_dir, batch_size=16, img_size=(256, 256), aug
         ToTensorV2(),
     ])
     
-    train_dataset = UnetDataset(data=images_data, targets=labels_data, 
+    train_dataset = UnetDataset(data=images_data, targets=masks_data, 
                                        transform=train_transformation)
 
-    val_dataset = UnetDataset(data=images_data, targets=labels_data, 
+    val_dataset = UnetDataset(data=images_data, targets=masks_data, 
                                      transform=val_transformation)
     
     train_size = int((1 - val_split) * len(images_data))
     
-    train_dataset = UnetDataset(images_data[:train_size], labels_data[:train_size], transform=train_transformation)
-    val_dataset = UnetDataset(images_data[train_size:], labels_data[train_size:], transform=val_transformation)
+    train_dataset = UnetDataset(images_data[:train_size], masks_data[:train_size], transform=train_transformation)
+    val_dataset = UnetDataset(images_data[train_size:], masks_data[train_size:], transform=val_transformation)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     
     return {'train': train_loader, 'val': val_loader}
+
+if __name__ == '__main__':
+    import sys
+    sys.path.append('.')
+    from config import *
+    
+    # Test the dataloader
+    dataloaders = get_dataloaders(image_dir=TRAIN_IMAGE_DIR, mask_dir=TRAIN_MASK_DIR)
+    train_loader = dataloaders['train']
+    val_loader = dataloaders['val']
+    
+    for images, masks in train_loader:
+        print(images.shape, masks.shape)
+        break
