@@ -56,8 +56,8 @@ class FirstServeDataset(Dataset):
 
     def __getitem__(self, idx):
         # Read image and mask files
-        img_path = os.path.join(self.img_dir, self.images[idx])
-        label_path = os.path.join(self.label_dir, self.images[idx])
+        img_path = os.path.join(self.image_dir, self.image_files[idx])
+        label_path = os.path.join(self.mask_files, self.image_files[idx])
         
         image = cv2.imread(img_path)  #  BGR
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Convert to RGB
