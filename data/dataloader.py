@@ -9,9 +9,9 @@ import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 class FirstServeDataset(Dataset):
-    def __init__(self, img_dir, label_dir, resize=None, transform=None):
-        self.image_dir = img_dir
-        self.mask_dir = label_dir
+    def __init__(self, image_dir, mask_dir, resize=None, transform=None):
+        self.image_dir = image_dir
+        self.mask_dir = mask_dir
         self.resize = resize
         self.transform = transform
         self.images = os.listdir(self.image_dir)
