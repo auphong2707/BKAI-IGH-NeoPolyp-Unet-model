@@ -5,9 +5,11 @@ import time
 
 from matplotlib import pyplot as plt, ticker
 import pandas as pd
-import cv2 # type: ignore
 import numpy as np
 import torch
+import torch.nn.functional as F
+from torchvision import transforms
+from PIL import Image
 
 def set_seed(seed):
     random.seed(seed)
@@ -67,59 +69,17 @@ def load_checkpoint(model: torch.nn.Module,
     print(f"Checkpoint loaded from {filepath}, trained for {epoch} epochs")
     return epoch
 
-def infer_test_set_color(model, test_dir, output_dir, device, input_size=(256, 256), threshold=0.5):
-    """
-    Infer segmentation masks for a test set, apply color coding, and save the results to a folder.
-    
-    Args:
-        model (torch.nn.Module): The trained U-Net model.
-        test_dir (str): Path to the folder containing test images.
-        output_dir (str): Path to the folder where output masks will be saved.
-        device (str): Device to run the inference ('cuda' or 'cpu').
-        input_size (tuple): The size (width, height) to resize input images.
-        threshold (float): Threshold for converting probabilities to binary masks.
-    """
-    # Ensure the output directory exists
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Set model to evaluation mode
-    model.eval()
-    
-    # Loop through all images in the test directory
-    for filename in os.listdir(test_dir):
-        if filename.endswith(('.png', '.jpg', '.jpeg')):  # Process only image files
-            image_path = os.path.join(test_dir, filename)
-            
-            # Load and preprocess the image
-            original_image = cv2.imread(image_path)
-            original_size = (original_image.shape[1], original_image.shape[0])  # (width, height)
-            resized_image = cv2.resize(original_image, input_size)  # Resize to model input size
-            input_tensor = torch.from_numpy(resized_image).permute(2, 0, 1).unsqueeze(0).float() / 255.0
-            input_tensor = input_tensor.to(device)
-            
-            # Infer using the model
-            with torch.no_grad():
-                output = model(input_tensor)  # Get raw logits or probabilities
-                output = torch.softmax(output, dim=1)  # Convert logits to class probabilities
-            
-            # Get class predictions
-            prediction = torch.argmax(output, dim=1).squeeze().cpu().numpy()  # Class labels (0, 1, 2)
+def mask_to_rgb(output, mask, 
+                color_dict={0: (0, 0, 0),
+                            1: (255, 0, 0),
+                            2: (0, 255, 0)}
+                ):
+    output = np.zeros((mask.shape[0], mask.shape[1], 3))
 
-            # Resize the class prediction to the original size
-            resized_prediction = cv2.resize(prediction, original_size, interpolation=cv2.INTER_NEAREST)
-            
-            # Create a color-coded mask
-            color_mask = np.zeros((*resized_prediction.shape, 3), dtype=np.uint8)
-            color_mask[resized_prediction == 1] = [0, 0, 255]  # Red for neoplastic polyps
-            color_mask[resized_prediction == 2] = [0, 255, 0]  # Green for non-neoplastic polyps
-            color_mask[resized_prediction == 0] = [0, 0, 0]    # Black for background
-            
-            # Save the color-coded mask as an image
-            output_path = os.path.join(output_dir, filename)
-            cv2.imwrite(output_path, color_mask)
+    for k in color_dict.keys():
+        output[mask==k] = color_dict[k]
 
-            print(f"Processed and saved: {output_path}")
-
+    return np.uint8(output)
 
 def as_minutes(s: int):
     """Converts seconds to minutes and seconds.

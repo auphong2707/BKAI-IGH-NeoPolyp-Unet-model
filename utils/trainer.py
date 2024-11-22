@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import time
+import wandb
 
 from utils.helper import save_checkpoint, load_checkpoint, save_loss, save_plot, time_since
 from utils.logger import setup_logger
@@ -11,8 +12,9 @@ from tqdm import tqdm
 class UNetTrainer:
     def __init__(self, 
                  model: nn.Module, 
-                 name: str, 
-                 learning_rate: float, 
+                 name: str,
+                 learning_rate: float,
+                 wandb_key: str,
                  device: str, 
                  criterion=nn.CrossEntropyLoss(), 
                  max_norm=1.0):
@@ -47,6 +49,15 @@ class UNetTrainer:
         if os.path.exists(best_checkpoint_path):
             checkpoint = torch.load(best_checkpoint_path)
             self.best_loss = checkpoint["loss"]
+            
+        wandb.login(
+            # set the wandb project where this run will be logged
+            # project= "PolypSegment", 
+            key = wandb_key,
+        )
+        wandb.init(
+            project = "PolypSegment"
+        )
 
     def train_epoch(self, dataloader):
         total_loss = 0
@@ -54,6 +65,8 @@ class UNetTrainer:
 
         for images, masks in tqdm(dataloader, desc="Training Epoch", leave=False):
             images, masks = images.to(self.device), masks.to(self.device)
+            
+            masks = masks.squeeze(dim=1).long()
 
             # Zero gradients
             self.optimizer.zero_grad()
@@ -68,7 +81,7 @@ class UNetTrainer:
             loss.backward()
 
             # Gradient clipping
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.max_norm)
+            # torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.max_norm)
 
             self.optimizer.step()
 
@@ -140,6 +153,7 @@ class UNetTrainer:
                 val_losses.append(val_loss)
                 
             save_loss(epoch, train_loss, val_loss, self.checkpoint_directory + '/losses.csv')
+            wandb.log({'Val_loss': val_loss,'Train_loss': train_loss})
 
         # Save the plot
         save_plot(self.checkpoint_directory + '/losses.csv', self.checkpoint_directory + '/losses.png')

@@ -10,15 +10,15 @@ TEST_IMAGE_DIR = "./data/test/test"
 # Model parameters
 IN_CHANNELS = 3
 OUT_CHANNELS = 3
-NUM_LAYERS = 5
-BASE_CHANNELS = 128
+NUM_LAYERS = 2
+BASE_CHANNELS = 64
 KERNEL_SIZE = 3
 PADDING = 1
 DROPOUT_RATE = 0.2
 UPSAMPLING_METHOD = "TransposedConv"
 
 # Training parameters
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 LEARNING_RATE = 0.00001
 NUM_EPOCHS = 30
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
