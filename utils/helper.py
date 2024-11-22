@@ -12,6 +12,7 @@ from torchvision import transforms
 from PIL import Image
 import cv2
 import albumentations as A
+from albumentations.pytorch.transforms import ToTensorV2
 
 def set_seed(seed):
     random.seed(seed)
