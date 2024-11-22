@@ -146,7 +146,7 @@ def save_plot(csv_directory, filename='loss_plot.png'):
     plt.savefig(filename)
     plt.close()  # Close the plot to free memory
 
-def mask_to_rgb(output, mask, 
+def mask_to_rgb(mask, 
                 color_dict={0: (0, 0, 0),
                             1: (255, 0, 0),
                             2: (0, 255, 0)}
