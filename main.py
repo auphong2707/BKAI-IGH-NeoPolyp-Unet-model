@@ -4,7 +4,6 @@ set_seed(42)
 from data.dataloader import get_dataloaders
 from models.unet import UNet
 from utils.trainer import UNetTrainer
-from utils.helper import infer_test_set_color
 from utils.mask2csv import convert_infer_to_csv
 from config import *
 import segmentation_models_pytorch as smp
