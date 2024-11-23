@@ -201,3 +201,43 @@ def infer_and_save(model, test_dir, output_dir, device):
         # Save the resulting mask
         save_path = os.path.join(output_dir, img_name)
         cv2.imwrite(save_path, mask_rgb)
+
+def infer_and_save_single(model, img_path, output_path, device):
+    """
+    Perform inference on a single image and save the output mask as an image.
+    
+    Args:
+        model: The trained PyTorch model.
+        img_path: Path to the input image.
+        output_dir: Path to the directory to save the output mask.
+        device: The device to perform inference on (e.g., 'cpu' or 'cuda').
+    """
+    val_transformation = A.Compose([
+        A.Normalize(mean=(0.485, 0.456, 0.406),std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ])
+    
+    model.eval()
+
+    ori_img = cv2.imread(img_path)
+    ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+    ori_h, ori_w = ori_img.shape[:2]
+
+    # Preprocess the image
+    img = cv2.resize(ori_img, (256, 256))
+    transformed = val_transformation(image=img)
+    input_img = transformed["image"].unsqueeze(0).to(device)
+    
+    # Perform inference
+    with torch.no_grad():
+        output_mask = model(input_img).squeeze(0).cpu().numpy().transpose(1, 2, 0)
+        
+    # Resize and process the output mask
+    mask = cv2.resize(output_mask, (ori_w, ori_h))
+    mask = np.argmax(mask, axis=2)
+    mask_rgb = mask_to_rgb(mask)
+    mask_rgb = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2BGR)
+    
+    # Save the resulting mask
+    cv2.imwrite(output_path, mask_rgb)
+    print(f"Your output mask has been saved at {output_path}")
