@@ -1,5 +1,5 @@
 from utils.helper import set_seed, infer_and_save
-set_seed(42)
+set_seed(464562)
 
 from data.dataloader import get_dataloaders
 from models.unet import UNet
