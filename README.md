@@ -2,6 +2,10 @@
 
 This project is for the development of a polyp segmentation model for the BKAI-IGH-NeoPolyp dataset. The model is based on the U-Net architecture and is trained using the PyTorch framework.
 
+**Wandb link** *(I can't change it to public so please send me request)*: [BKAI-IGH-NeoPolyp-Unet-model-wandb](https://wandb.ai/veil-hanoi-university-of-science-and-technology/BKAI-IGH-NeoPolyp-Unet-model?nw=nwuserveil)
+
+**Hugging Face**: [BKAI-IGH-NeoPolyp-Unet-model-HF](https://huggingface.co/auphong2707/BKAI-IGH-NeoPolyp-Unet-model)
+
 ## Inference
 1. Install the necessary packages:
     ```bash
@@ -31,3 +35,5 @@ If you want to train your own model, you can follow the steps below:
     python3 train.py --huggingface_token <your_huggingface_token> --wandb_key <your_wandb_key>
     ```
     The models will be saved in the Hugging Face repository you specified in the `main.py` script.
+
+[def]: here
