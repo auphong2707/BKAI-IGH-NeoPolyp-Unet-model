@@ -8,27 +8,22 @@ def rle_to_string(runs):
 
 def rle_encode_one_mask(mask):
     pixels = mask.flatten()
-    pixels[pixels > 0] = 255
+    pixels[pixels > 225] = 255
+    pixels[pixels <= 225] = 0
     use_padding = False
     if pixels[0] or pixels[-1]:
         use_padding = True
         pixel_padded = np.zeros([len(pixels) + 2], dtype=pixels.dtype)
         pixel_padded[1:-1] = pixels
         pixels = pixel_padded
-    
     rle = np.where(pixels[1:] != pixels[:-1])[0] + 2
     if use_padding:
         rle = rle - 1
     rle[1::2] = rle[1::2] - rle[:-1:2]
+    
     return rle_to_string(rle)
 
 def rle2mask(mask_rle, shape=(3,3)):
-    '''
-    mask_rle: run-length as string formated (start length)
-    shape: (width,height) of array to return 
-    Returns numpy array, 1 - mask, 0 - background
-
-    '''
     s = mask_rle.split()
     starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
     starts -= 1
@@ -39,7 +34,6 @@ def rle2mask(mask_rle, shape=(3,3)):
     return img.reshape(shape).T
 
 def mask2string(dir):
-    ## mask --> string
     strings = []
     ids = []
     ws, hs = [[] for i in range(2)]
