@@ -33,6 +33,7 @@ class UNetTrainer:
         self.model = model.to(device)
         self.device = device
         self.criterion = criterion
+        self.learning_rate = learning_rate
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
         self.max_norm = max_norm
 
@@ -114,6 +115,10 @@ class UNetTrainer:
         # Load checkpoint if available
         load_checkpoint_path = self.checkpoint_directory + '/checkpoint.pth'
         start_epoch = load_checkpoint(self.model, self.optimizer, load_checkpoint_path) + 1
+        
+        # Update optimizer learning rate
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = self.learning_rate
         
         print(f"\nStart training from epoch {start_epoch}")
         print('-' * 80)
